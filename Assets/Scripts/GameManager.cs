@@ -7,7 +7,15 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     [SerializeField] float waitForRestart = 2;
+    public int enemyCount {get; set;}
 
+    PlayerCharacter _player;
+    public PlayerCharacter Player{
+        get{
+            if(_player == null) _player = FindObjectOfType<PlayerCharacter>();
+            return _player;
+        }
+    }
     void Awake(){
         if(instance == null){
             instance = this;
@@ -20,6 +28,12 @@ public class GameManager : MonoBehaviour
     void Start(){
     }
 
+    void EnemyKilled(SkeletonAI enemy)
+    {
+        Debug.Log($"Enemy {enemy.gameObject.name} was disposed");
+        enemyCount--;
+        if (enemyCount <= 0) GameWin();
+    }
     
 
     void GameWin(){
