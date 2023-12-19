@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerCharacter : Character
 {
     CharacterController _characterController;
-    [SerializeField] float _receivedDamage = 20f;
+    [SerializeField] Slider _healthSlider;
     // [SerializeField] Slider _healthSlider;
     protected override void Start(){
         base.Start();
@@ -35,7 +36,7 @@ public class PlayerCharacter : Character
     protected override void UpdateHealth()
     {
         base.UpdateHealth();
-        // _healthSlider.value = HealthPercent;
+        _healthSlider.value = HealthPercent;
     }
 
     void OnTriggerEnter(Collider other){

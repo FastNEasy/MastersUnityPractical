@@ -26,7 +26,9 @@ public class SkeletonAI : Character
     private bool canRun = false;
     public bool turnOffWalk = false;
     Vector3 playerPos;
-    public event System.Action<SkeletonAI> onSkellyKilled;
+    // public event System.Action<SkeletonAI> OnSkellyKilled;
+
+    float deleteBodyTime = 3f;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -34,6 +36,7 @@ public class SkeletonAI : Character
         base.Start();
         _navmeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponentInChildren<Animator>();
+        // Debug.Log(OnSkellyKilled);
         StartCoroutine(SkellyStates());
     }
     private IEnumerator SkellyStates(){
@@ -111,7 +114,11 @@ public class SkeletonAI : Character
         _navmeshAgent.isStopped = true;
         _navmeshAgent.velocity = Vector3.zero;
         _animator.SetTrigger("Dead");
-        onSkellyKilled.Invoke(this);
+        // OnSkellyKilled.Invoke(this);
+        // GameManager.instance.EnemyKilled(this);
+        GameManager.instance.enemyCount -= 1;
+        //remove the body of the skeleton after set time
+        StartCoroutine(RemoveSkeleton());
     }
 
     void SwitchRunningAnim(bool choice){
@@ -139,5 +146,10 @@ public class SkeletonAI : Character
             Debug.Log("Enemy got hit for " + weapon.damage);
             GetHit(weapon.damage);
        }
+    }
+
+    private IEnumerator RemoveSkeleton(){
+        yield return new WaitForSeconds(deleteBodyTime);
+        Destroy(gameObject);
     }
 }

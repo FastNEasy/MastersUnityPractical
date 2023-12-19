@@ -6,8 +6,12 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    [SerializeField] float waitForRestart = 2;
+    [SerializeField] float waitForRestart = 5;
     public int enemyCount {get; set;}
+    // public int waveState {get; set;}
+
+    public bool levelStarted {get; set;}
+    // public bool waveCompleted {get; set;}
 
     PlayerCharacter _player;
     public PlayerCharacter Player{
@@ -17,6 +21,10 @@ public class GameManager : MonoBehaviour
         }
     }
     void Awake(){
+        enemyCount = 3;
+        levelStarted = false;
+        // waveState = 1;
+        // waveCompleted = false;
         if(instance == null){
             instance = this;
         }
@@ -25,22 +33,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void Start(){
-        FindObjectOfType<SkeletonAI>().onSkellyKilled += EnemyKilled;
-    }
+    // void Start(){
+    //     // StartNextWave();
+    //     survivalStarted = true;
+    //     // FindObjectOfType<SkeletonAI>().onSkellyKilled += EnemyKilled;
 
-    void EnemyKilled(SkeletonAI enemy)
-    {
-        Debug.Log($"Enemy {enemy.gameObject.name} was disposed");
-        enemyCount--;
-        if (enemyCount <= 0) GameWin();
-    }
+    // }
+
+    // public void EnemyKilled(SkeletonAI skelly)
+    // {
+    //     enemyCount--;
+    //     //GameWin()
+    //     if (enemyCount <= 0){
+    //         waveCompleted = true;
+    //         waveState++;
+    //         // Debug.Log("I work!");
+    //         // StartNextWave();
+    //         if(waveState > 3) GameWin();
+    //     }
+    // }
     
 
     void GameWin(){
         Debug.Log("Game win");
         StartCoroutine(RestartRoutine());
     }
+    
+    // public void StartNextWave(){
+    //     Debug.Log("Next wave: " + waveState);
+    //     waveCompleted = false;
+    //     enemyCount = waveState;
+
+    //     // FindObjectOfType<SkeletonAI>().OnSkellyKilled += EnemyKilled;
+
+    // }
 
     IEnumerator RestartRoutine()
     {
