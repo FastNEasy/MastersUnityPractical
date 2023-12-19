@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     }
 
     void Start(){
+        FindObjectOfType<SkeletonAI>().onSkellyKilled += EnemyKilled;
     }
 
     void EnemyKilled(SkeletonAI enemy)

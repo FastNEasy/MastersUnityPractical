@@ -14,6 +14,10 @@ public class SkeletonAI : Character
     }
     [SerializeField] private float attackDistance = 3f;
     [SerializeField] private float runDistance = 6f;
+    // [SerializeField] AudioClip hitClip;
+    // [SerializeField] AudioClip attackClip;
+    // [SerializeField] AudioClip deathClip;
+    private Animator _animator;
     private NavMeshAgent _navmeshAgent;
     private State lastState;
     private State currentState;
@@ -29,6 +33,7 @@ public class SkeletonAI : Character
     {
         base.Start();
         _navmeshAgent = GetComponent<NavMeshAgent>();
+        _animator = GetComponentInChildren<Animator>();
         StartCoroutine(SkellyStates());
     }
     private IEnumerator SkellyStates(){
@@ -88,35 +93,29 @@ public class SkeletonAI : Character
     void StartWalking(){
         _navmeshAgent.isStopped = false;
         _navmeshAgent.speed = 0.8f;
-        // SwitchAttackAnim(false);
         SwitchRunningAnim(false);
     }
     void StartRunning(){
        _navmeshAgent.isStopped = false;
        _navmeshAgent.speed = 3f;
-    //    _animator.SetTrigger("Run");
-    //    SwitchAttackAnim(false);
        SwitchRunningAnim(true);
     }
     void StartAttacking(){
         _navmeshAgent.isStopped = true;
         _navmeshAgent.velocity = Vector3.zero;
-         
-        // SwitchAttackAnim(true);
+        _animator.SetTrigger("Attack");
         SwitchRunningAnim(false);
     }
     void StartToDie(){
+        //on death send gamemanager a message
         _navmeshAgent.isStopped = true;
         _navmeshAgent.velocity = Vector3.zero;
-        GameManager.instance.enemyCount -= 1;
-       
-        //dying things
+        _animator.SetTrigger("Dead");
+        onSkellyKilled.Invoke(this);
     }
-    void SwitchAttackAnim(bool choice){//to avoid DRY
-        // _animator.SetBool("isAttacking", choice);
-    }
+
     void SwitchRunningAnim(bool choice){
-        // _animator.SetBool("isRunning", choice);
+        _animator.SetBool("isRunning", choice);
     }
     void GetHit(float damage){
         //apply damage to the enemy
@@ -124,7 +123,7 @@ public class SkeletonAI : Character
         // if(!_audioSrc.isPlaying){
         //     _audioSrc.PlayOneShot(hitClip);
         // }
-        // _animator.SetTrigger("isHit");
+        _animator.SetTrigger("isHit");
     }
      public override void AddDamage(float damage)
     {
@@ -132,12 +131,11 @@ public class SkeletonAI : Character
         if(isDead){
             currentState = State.Dying;
             turnOffWalk = true;
-            onSkellyKilled.Invoke(this);
         }
     }
     private void OnTriggerEnter(Collider other){
         Weapon weapon = other.GetComponentInParent<Weapon>();
-         if(weapon != null){
+         if(weapon != null && weapon.isPlayerWeapon){
             Debug.Log("Enemy got hit for " + weapon.damage);
             GetHit(weapon.damage);
        }

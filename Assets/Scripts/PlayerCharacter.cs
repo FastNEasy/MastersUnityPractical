@@ -39,12 +39,10 @@ public class PlayerCharacter : Character
     }
 
     void OnTriggerEnter(Collider other){
-        SkeletonAI skelly = other.GetComponentInParent<SkeletonAI>();
-        if(skelly != null){
-            // _hitSrc.Stop();
-            Debug.Log("I got hit! My health:" + health);
-            // _hitSrc.Play();
-            AddDamage(_receivedDamage);
-        }
+        Weapon weapon = other.GetComponentInParent<Weapon>();
+         if(weapon != null && !weapon.isPlayerWeapon){
+            Debug.Log("I got hit by skelly for " + weapon.damage);
+            AddDamage(weapon.damage);
+       }
     }
 }
