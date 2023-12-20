@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    [SerializeField] float waitForRestart = 5;
+    [SerializeField] float waitForRestart = 6f;
     public int enemyCount {get; set;}
     // public int waveState {get; set;}
 
@@ -54,8 +54,16 @@ public class GameManager : MonoBehaviour
     // }
     
 
-    void GameWin(){
+    public void GameWin(){
         Debug.Log("Game win");
+        //display win window
+        // _player.
+        StartCoroutine(RestartRoutine());
+    }
+
+    public void GameLose(){
+        Debug.Log("Game lose");
+        //display lose window
         StartCoroutine(RestartRoutine());
     }
     
@@ -76,6 +84,7 @@ public class GameManager : MonoBehaviour
     }
 
     void RestartGame(){
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        //SceneManager.GetActiveScene().name
+        SceneManager.LoadScene("MainMenu");
     }
 }

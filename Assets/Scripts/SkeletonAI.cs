@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.XR.Interaction.Toolkit;
 public class SkeletonAI : Character
 {
     private enum State
@@ -14,11 +15,12 @@ public class SkeletonAI : Character
     }
     [SerializeField] private float attackDistance = 3f;
     [SerializeField] private float runDistance = 6f;
-    // [SerializeField] AudioClip hitClip;
-    // [SerializeField] AudioClip attackClip;
-    // [SerializeField] AudioClip deathClip;
+    [SerializeField] AudioClip hitClip;
+    [SerializeField] AudioClip attackClip;
+    [SerializeField] AudioClip deathClip;
     private Animator _animator;
     private NavMeshAgent _navmeshAgent;
+    private AudioSource _audioSrc;
     private State lastState;
     private State currentState;
     private bool stateStarted = false;
@@ -27,6 +29,7 @@ public class SkeletonAI : Character
     public bool turnOffWalk = false;
     Vector3 playerPos;
     // public event System.Action<SkeletonAI> OnSkellyKilled;
+  
 
     float deleteBodyTime = 3f;
 
@@ -36,6 +39,7 @@ public class SkeletonAI : Character
         base.Start();
         _navmeshAgent = GetComponent<NavMeshAgent>();
         _animator = GetComponentInChildren<Animator>();
+        _audioSrc = GetComponent<AudioSource>();
         // Debug.Log(OnSkellyKilled);
         StartCoroutine(SkellyStates());
     }
@@ -106,13 +110,19 @@ public class SkeletonAI : Character
     void StartAttacking(){
         _navmeshAgent.isStopped = true;
         _navmeshAgent.velocity = Vector3.zero;
+        if(!_audioSrc.isPlaying){
+            _audioSrc.PlayOneShot(attackClip);
+        }
         _animator.SetTrigger("Attack");
         SwitchRunningAnim(false);
     }
     void StartToDie(){
-        //on death send gamemanager a message
+        //on death send gamemanager a message (create in next version)
+        _audioSrc.Stop();
         _navmeshAgent.isStopped = true;
         _navmeshAgent.velocity = Vector3.zero;
+        turnOffWalk = true;
+        _audioSrc.PlayOneShot(deathClip);
         _animator.SetTrigger("Dead");
         // OnSkellyKilled.Invoke(this);
         // GameManager.instance.EnemyKilled(this);
@@ -127,9 +137,9 @@ public class SkeletonAI : Character
     void GetHit(float damage){
         //apply damage to the enemy
         AddDamage(damage);
-        // if(!_audioSrc.isPlaying){
-        //     _audioSrc.PlayOneShot(hitClip);
-        // }
+        if(!_audioSrc.isPlaying){
+            _audioSrc.PlayOneShot(hitClip);
+        }
         _animator.SetTrigger("isHit");
     }
      public override void AddDamage(float damage)
